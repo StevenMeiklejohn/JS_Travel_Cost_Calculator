@@ -10,40 +10,19 @@ var findLocation = function(){
 };
 
 
-// var requestLatLongFromPostcode = function (postcode) {
-//   var jsonPostcodes = JSON.stringify({"postcodes" : ["G53 5JD", "KA23 9JE"]});
-//   var jsonArray = JSON.stringify(["G53 5JD", "KA23 9JE"]);
-//   console.log('JSON postcodes', jsonPostcodes);
-//   var url = 'https://api.postcodes.io/' + jsonPostcodes;
-//   console.log('url', url);
-//   var request = new XMLHttpRequest();
-//   request.open('POST', url);
-//   // request.setRequestHeader("Content-type", "application/json");
-//
-//
-//   request.addEventListener('load', function () {
-//     var response = JSON.parse(request.responseText);
-//     console.log('response:', response);
-//     convertedPostCode = { lat: response.result.latitude, lng: response.result.longitude };
-//     setGlobalArray(convertedPostCode);
-//     console.log('convertedPostCode', convertedPostCode);
-//   });
-//   request.send();
-// };
-
 function postAjax(url, data, success) {
-    var params = typeof data == 'string' ? data : Object.keys(data).map(
-            function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
-        ).join('&');
-    var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xhr.open('POST', url);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
-    };
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(params);
-    return xhr;
+  var params = typeof data == 'string' ? data : Object.keys(data).map(
+    function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+  ).join('&');
+  var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+  xhr.open('POST', url);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+  };
+  xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(params);
+  return xhr;
 }
 
 var handleButtonClick = function(){
@@ -56,34 +35,27 @@ var handleButtonClick = function(){
   var requestArray = [originPostcode, destinationPostcode];
   var requestedObject = {"postcodes": requestArray};
   var convertedRequestArray = JSON.stringify(requestedObject);
-  // var postcodes = {"postcodes" : [originPostcode, destinationPostcode]};
-  // console.log('postcodes object', postcodes);
-   // requestLatLongFromPostcode(originPostcode);
-   // requestLatLongFromPostcode(destinationPostcode);
-   // calcNewRoute();
-   postAjax('https://api.postcodes.io/postcodes', convertedRequestArray, function(data){
-     var parsedData = JSON.parse(data);
-     console.log(parsedData);
-     calcNewRoute(parsedData);
-   });
-
-
+  postAjax('https://api.postcodes.io/postcodes', convertedRequestArray, function(data){
+    var parsedData = JSON.parse(data);
+    console.log(parsedData);
+    calcNewRoute(parsedData);
+  });
 };
 
 function calcNewRoute(data) {
-console.log("data", data);
-var newOrigin = {lat: data.result[0].result.latitude, lng: data.result[0].result.longitude};
-var newDestination = {lat: data.result[1].result.latitude, lng: data.result[1].result.longitude};
-console.log('calcNewRoute, newOrigin', newOrigin);
-console.log('calcNewRoute, newDestination', newDestination);
+  console.log("data", data);
+  var newOrigin = {lat: data.result[0].result.latitude, lng: data.result[0].result.longitude};
+  var newDestination = {lat: data.result[1].result.latitude, lng: data.result[1].result.longitude};
+  console.log('calcNewRoute, newOrigin', newOrigin);
+  console.log('calcNewRoute, newDestination', newDestination);
 
 
   var request = {
-      origin: newOrigin,
-      destination: newDestination,
-      unitSystem: google.maps.UnitSystem.METRIC,
-      travelMode: google.maps.TravelMode.DRIVING
-    }
+    origin: newOrigin,
+    destination: newDestination,
+    unitSystem: google.maps.UnitSystem.METRIC,
+    travelMode: google.maps.TravelMode.DRIVING
+  }
   directionsService.route(request, function(result, status) {
     if (status == 'OK') {
       console.log(result.routes[0].legs[0].distance.value);
@@ -112,25 +84,23 @@ var initialize = function(){
   mainMap.addInfoWindow(center, "Start spreadin' the news, I'm leavin' today <br>I want to be a part of it <br> <b>New York, New York</b>");
   directionsRenderer.setMap(mainMap.googleMap);
 
-    function calcRoute(origin, destination) {
-      // var start = document.getElementById('start').value;
-      // var end = document.getElementById('end').value;
-      var request = {
-          origin: origin,
-          destination: destination,
-          unitSystem: google.maps.UnitSystem.METRIC,
-          travelMode: google.maps.TravelMode.DRIVING
-        }
-      directionsService.route(request, function(result, status) {
-        if (status == 'OK') {
-          console.log(result.routes[0].legs[0].distance.value);
-          directionsRenderer.setDirections(result);
-          var pTag = document.querySelector("#distance");
-          var calculatedDistance = (result.routes[0].legs[0].distance.value / 1.6) / 1000;
-          distanceDisplay.innerText = "Calculated Distance: " + calculatedDistance + " miles.";
-        }
-      });
-    };
+  function calcRoute(origin, destination) {
+    var request = {
+      origin: origin,
+      destination: destination,
+      unitSystem: google.maps.UnitSystem.METRIC,
+      travelMode: google.maps.TravelMode.DRIVING
+    }
+    directionsService.route(request, function(result, status) {
+      if (status == 'OK') {
+        console.log(result.routes[0].legs[0].distance.value);
+        directionsRenderer.setDirections(result);
+        var pTag = document.querySelector("#distance");
+        var calculatedDistance = (result.routes[0].legs[0].distance.value / 1.6) / 1000;
+        distanceDisplay.innerText = "Calculated Distance: " + calculatedDistance + " miles.";
+      }
+    });
+  };
 
   calcRoute(origin, destination);
 }
