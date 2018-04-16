@@ -1,39 +1,123 @@
 
+var mainMap;
+var directionsService = new google.maps.DirectionsService();
+var directionsRenderer= new google.maps.DirectionsRenderer();
+
+
+
 var findLocation = function(){
   mainMap.geoLocate();
 };
+
+
+// var requestLatLongFromPostcode = function (postcode) {
+//   var jsonPostcodes = JSON.stringify({"postcodes" : ["G53 5JD", "KA23 9JE"]});
+//   var jsonArray = JSON.stringify(["G53 5JD", "KA23 9JE"]);
+//   console.log('JSON postcodes', jsonPostcodes);
+//   var url = 'https://api.postcodes.io/' + jsonPostcodes;
+//   console.log('url', url);
+//   var request = new XMLHttpRequest();
+//   request.open('POST', url);
+//   // request.setRequestHeader("Content-type", "application/json");
+//
+//
+//   request.addEventListener('load', function () {
+//     var response = JSON.parse(request.responseText);
+//     console.log('response:', response);
+//     convertedPostCode = { lat: response.result.latitude, lng: response.result.longitude };
+//     setGlobalArray(convertedPostCode);
+//     console.log('convertedPostCode', convertedPostCode);
+//   });
+//   request.send();
+// };
+
+function postAjax(url, data, success) {
+    var params = typeof data == 'string' ? data : Object.keys(data).map(
+            function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+        ).join('&');
+    var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+    xhr.open('POST', url);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+    };
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(params);
+    return xhr;
+}
 
 var handleButtonClick = function(){
   var originInput = document.getElementById("origin");
   var destinationInput = document.getElementById("destination");
   var originPostcode = originInput.value;
   var destinationPostcode = destinationInput.value;
-  console.log("origin", originPostcode);
-  console.log("destination", destinationPostcode);
+  console.log("input origin", originPostcode);
+  console.log("input destination", destinationPostcode);
+  var requestArray = [originPostcode, destinationPostcode];
+  var requestedObject = {"postcodes": requestArray};
+  var convertedRequestArray = JSON.stringify(requestedObject);
+  // var postcodes = {"postcodes" : [originPostcode, destinationPostcode]};
+  // console.log('postcodes object', postcodes);
+   // requestLatLongFromPostcode(originPostcode);
+   // requestLatLongFromPostcode(destinationPostcode);
+   // calcNewRoute();
+   postAjax('https://api.postcodes.io/postcodes', convertedRequestArray, function(data){
+     var parsedData = JSON.parse(data);
+     console.log(parsedData);
+     calcNewRoute(parsedData);
+   });
+
+
+};
+
+function calcNewRoute(data) {
+console.log("data", data);
+var newOrigin = {lat: data.result[0].result.latitude, lng: data.result[0].result.longitude};
+var newDestination = {lat: data.result[1].result.latitude, lng: data.result[1].result.longitude};
+console.log('calcNewRoute, newOrigin', newOrigin);
+console.log('calcNewRoute, newDestination', newDestination);
+
+
+  var request = {
+      origin: newOrigin,
+      destination: newDestination,
+      unitSystem: google.maps.UnitSystem.METRIC,
+      travelMode: google.maps.TravelMode.DRIVING
+    }
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      console.log(result.routes[0].legs[0].distance.value);
+      directionsRenderer.setDirections(result);
+      var pTag = document.querySelector("#distance");
+      var calculatedDistance = (result.routes[0].legs[0].distance.value / 1.6) / 1000;
+      const distanceDisplay = document.querySelector("#distance");
+      distanceDisplay.innerText = "Calculated Distance: " + calculatedDistance + " miles.";
+    }
+  });
 };
 
 var initialize = function(){
+  var origin = { lat: 55.824636, lng: -4.3419518 };
+  var destination = { lat: 55.856158, lng: -4.2439485 };
   var mapDiv = document.getElementById('main-map');
   // var chicagoButton = document.querySelector('#chicago-button');
   // var whereAmIButton = document.querySelector('#geo-button');
   var center = { lat: 55.9533, lng: -4.5 };
-  var mainMap = new MapWrapper(mapDiv, center, 10);
+  mainMap = new MapWrapper(mapDiv, center, 10);
   var calculateButton = document.getElementById("calculateButton");
   calculateButton.addEventListener('click', handleButtonClick);
   const distanceDisplay = document.querySelector("#distance");
   // mainMap.addMarker(center);
   mainMap.addClickEvent();
   mainMap.addInfoWindow(center, "Start spreadin' the news, I'm leavin' today <br>I want to be a part of it <br> <b>New York, New York</b>");
-  const directionsService = new google.maps.DirectionsService();
-  const directionsRenderer= new google.maps.DirectionsRenderer();
   directionsRenderer.setMap(mainMap.googleMap);
 
-    function calcRoute() {
+    function calcRoute(origin, destination) {
       // var start = document.getElementById('start').value;
       // var end = document.getElementById('end').value;
       var request = {
-          origin: { lat: 55.824636, lng: -4.3419518 },
-          destination: { lat: 55.856158, lng: -4.2439485 },
+          origin: origin,
+          destination: destination,
           unitSystem: google.maps.UnitSystem.METRIC,
           travelMode: google.maps.TravelMode.DRIVING
         }
@@ -46,19 +130,9 @@ var initialize = function(){
           distanceDisplay.innerText = "Calculated Distance: " + calculatedDistance + " miles.";
         }
       });
-    }
+    };
 
-  //   var goToChicago = function(){
-  //     var chicago = { lat: 41.878114, lng: -87.629798 };
-  //     mainMap.googleMap.setCenter(chicago);
-  //     mainMap.addInfoWindow(chicago, "<h3>Chicago</h3>");
-  //   }
-  //
-
-  //
-  // chicagoButton.addEventListener('click', goToChicago);
-  // whereAmIButton.addEventListener('click', findLocation);
-  calcRoute();
+  calcRoute(origin, destination);
 }
 
 window.addEventListener('load', initialize);

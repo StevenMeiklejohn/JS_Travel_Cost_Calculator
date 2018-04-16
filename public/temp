@@ -1,0 +1,17 @@
+  // requestLatLongFromPostcode(originPostcode, destinationPostcode);
+
+
+
+
+// var requestLatLongFromPostcode = function (originPostcode, destinationPostcode) {
+//   var url = 'api.postcodes.io/postcodes/'+originPostcode;
+//   var request = new XMLHttpRequest();
+//   request.open('GET', url);
+//
+//   request.addEventListener('load', function () {
+//     var postcodeLatLong = JSON.parse(request.responseText);
+//     console.log(postcodeLatLong);
+//   });
+//
+//   request.send();
+// };
