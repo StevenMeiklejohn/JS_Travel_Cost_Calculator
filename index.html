@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <title>Google Maps</title>
-    <link rel='stylesheet' type='text/css' href='main.css'>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
-    <script type="text/javascript" src="mapWrapper.js"></script>
-    <script src='app.js'></script>
-  </head>
+<head>
+  <title>Google Maps</title>
+  <link rel='stylesheet' type='text/css' href='main.css'>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+  <script type="text/javascript" src="mapWrapper.js"></script>
+  <script src='app.js'></script>
 
-  <body>
+  <link href='https://fonts.googleapis.com/css?family=Alegreya+Sans:400,800' rel='stylesheet' type='text/css'>
+  <nav class="menu">
+    <ul>
+      <li><a href="#products">Home</a></li>
+      <li><a href="#services">Employees</a></li>
+      <li><a href="#careers">Shifts</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-    <div id='main-map'></div>
+</head>
 
-    <!-- <button id='geo-button'>Where Am I?</button> -->
-
-    <input type="text" id="origin" placeholder="Origin"/>
-    <input type="text" id="destination" placeholder="Destination"/>
-    <button id="calculateButton">Calculate</button>
-
-    <p id="distance">Calulated distance.</p>
+<body>
 
 
+  <div id='main-map'></div>
 
-  </body>
+  <div id='logo'>
+    <img id='logo_image' src="logo.png">
+  </div>
+
+  <!-- <button id='geo-button'>Where Am I?</button> -->
+  <div id='inputs'>
+  <input type="text" id="origin" class="resizedTextbox" placeholder="Origin"/>
+  <input type="text" id="destination" class="resizedTextbox" placeholder="Destination"/>
+  <button id="calculateButton">Calculate</button>
+  <p id="distance">Calulated distance: </p>
+  </div>
+
+
+
+</body>
 
 </html>

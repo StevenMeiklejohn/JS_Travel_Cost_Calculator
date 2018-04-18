@@ -62,8 +62,9 @@ function calcNewRoute(data) {
       directionsRenderer.setDirections(result);
       var pTag = document.querySelector("#distance");
       var calculatedDistance = (result.routes[0].legs[0].distance.value / 1.6) / 1000;
+      var roundedDistance = Math.round(calculatedDistance * 100) / 100
       const distanceDisplay = document.querySelector("#distance");
-      distanceDisplay.innerText = "Calculated Distance: " + calculatedDistance + " miles.";
+      distanceDisplay.innerText = "Calculated Distance: " + roundedDistance + " miles.";
     }
   });
 };
